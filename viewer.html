@@ -1,0 +1,20 @@
+@if (title) {
+  <main class="message" role="alert"><h1>{{title}}</h1><p>{{detail}}</p>
+    @if (documentAbsent) {
+      <p>Identifiant LRE : {{identifiant}}<br>Code ACAM : {{acam}}<br>Date du document : {{date || 'Non renseignée'}}</p>
+    } @else { <p>Si le problème persiste, contactez le CAI au 02 38 65 70 02 ou au 4 13 13 depuis Levallois, Prony ou Saran.</p> }
+  </main>
+} @else if (dossier; as d) {
+  <main class="viewer"><aside><header>Documents Viewer</header>
+    @if (!lre) {
+      <button (click)="toggleScreen()" [attr.aria-pressed]="secondaire">Positionnement sur écran : {{secondaire ? 'secondaire' : 'principal'}}</button>
+      <dl><dt>Session</dt><dd>{{d.sessionId}}</dd><dt>Client</dt><dd>{{d.nomClient}}</dd><dt>Déclaration</dt><dd>{{d.declaration}} {{d.cle}}</dd></dl>
+      @if (d.idSequence) { <button (click)="attachments()">Pièces jointes présentes, cliquer pour les afficher</button> }
+    }
+    <nav aria-label="Documents">@for (doc of d.documents; track $index) {
+      <button (click)="open(doc)" [attr.aria-current]="selected === doc ? 'true' : null">{{doc.libelle || doc.nom}}</button>
+    }</nav></aside>
+    <section>@if (notice) { <p role="alert">{{notice}}</p> }
+    @if (pdf) { <iframe [title]="selected?.nom || 'Document PDF'" [src]="pdf"></iframe> }</section>
+  </main>
+} @else { <main class="message" role="status"><progress></progress><p>La composition des documents est en cours, veuillez patienter pendant le chargement.</p></main> }
