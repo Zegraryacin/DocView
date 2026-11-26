@@ -1,0 +1,15 @@
+<main role="alert">
+  <h1>{{ error.title }}</h1>
+  @if (error.cause) { <p>Cause : {{ error.cause }}</p> }
+  <p>{{ error.message }}</p>
+  @if (error.lre; as lre) {
+    <dl>
+      <dt>Identifiant LRE</dt><dd>{{ lre.idLre }}</dd>
+      <dt>Code ACAM</dt><dd>{{ lre.codeAcam }}</dd>
+      <dt>Date du document</dt><dd>{{ lre.dateLre || 'Non renseignée' }}</dd>
+    </dl>
+  }
+  @if (error.contactSupport) {
+    <p>Si le problème persiste, contactez le CAI au 02 38 65 70 02 ou au 4 13 13 depuis Levallois, Prony ou Saran.</p>
+  }
+</main>

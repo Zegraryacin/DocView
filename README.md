@@ -1,18 +1,39 @@
-# Documents Viewer Angular
-Projet standalone Angular 20.3. Utiliser Node 22.12+ de la branche 22 et npm.
+# DocView — Angular 20 et API Quarkus
 
-## Démarrage
-Lancer Quarkus sur localhost:8080, puis npm install et npm start dans ce dossier. Ouvrir http://localhost:4200/?mode=denotresil&code-acam=EXEMPLE&id-lre=EXEMPLE (remplacer les deux valeurs). Ajouter &date-lre=2025-01-15 si nécessaire. Pour le bouchon AIS ouvrir /?pj=true ; pour le bouchon LRE ouvrir /?mode=denotresil. La politique de démo et les droits restent ceux de Quarkus. Pour changer la cible de développement modifier proxy.json.
+Viewer Angular organisé en composants NgModule, adapté aux parcours AIS et LRE du backend fourni.
 
-## Lancement par l'application appelante
-Pour les POST de l'ancien portail, exécuter npm run build puis npm run serve. Le serveur local sur 4201 accepte les formulaires URL-encodés vers /faces/view.faces, y compris avec un préfixe historique. Il transmet les paramètres à Angular dans la page initiale. Exemple de champs AIS : mode=ais et jsonDoc contenant l'objet InterOpId sérialisé. En LRE : mode=denotresil et jsonDemande contenant codeAcam, idLre et, si connue, dateLRE. Les boutons historiques TEST, TEST SANS DATE et TEST BOUCHON correspondent à une demande avec date, sans date et sans paramètres métier.
+## Pour CAP-UP_docviewer
 
-En déploiement, exposer le viewer à la racine de son origine et router /documents/* vers la racine REST réelle de Quarkus. Envoyer les pages et bundles vers le port 4201. Le serveur de développement Angular sert au lancement GET ; le serveur de compatibilité traite les POST. Utiliser la session du portail et sa passerelle d'authentification. Si le socle impose un intercepteur Bearer, enregistrer celui du projet au bootstrap. Le frontend ne fabrique aucun jeton.
+Suivre [INTEGRATION-CAP-UP.md](INTEGRATION-CAP-UP.md). Copier le module métier `src/app/viewer/` puis compléter le module et les routes existants. Le démarrage CoveUse reste celui de CAP-UP.
 
-## Comportement et raccordements
-- AIS transmet l'objet InterOpId directement en JSON à POST /documents/ais. LRE utilise GET /documents/lre avec code-acam, id-lre et date-lre facultative. La composition, les seuils de purge/archivage et le choix du jeu de démo restent sur le serveur.
-- Le menu suit l'ordre du tableau documents de Quarkus. Chaque fenêtre conserve sa propre sélection et décode uniquement le contenu du PDF sélectionné. Le navigateur doit autoriser son lecteur PDF et frame-src blob:.
-- Les pièces jointes envoient à la fenêtre ouvrante l'événement afficher-document-list avec detail.idDocumentList. Le portail doit conserver window.opener et partager l'origine exacte du viewer ; un portail sur une autre origine nécessite un relais postMessage validé des deux côtés.
-- Le bouton écran mémorise le choix dans nbEcrans. Le placement physique appartient au lanceur. menuview.js et les logos originaux ne figuraient pas dans les captures. Le titre texte peut être remplacé par les ressources graphiques de l'application.
-- Conserver pageTechnique.jsp au cours de la transition si le portail l'appelle dans une iframe. Elle utilise l'API du portail pour keepalive et logout ; ces routes ne figurent pas dans DocumentResource. Le viewer Angular ne remplace pas ce contrat de session.
-- L'adaptateur d'erreurs dans src/main.ts lit code/libelle, message ou messages[0]. Vérifier le JSON réel du socle pour un 400 LRE_ARCHIVEE, un 401/403 et une erreur technique. Un résultat vide donne un message explicite.
+## Organisation
+
+- `src/app/viewer/viewer.component.*` orchestre le chargement AIS/LRE et la sélection.
+- `document-menu/` affiche la liste des documents.
+- `pdf-viewer/` transforme le base64 en PDF et libère les URL blob.
+- `viewer-error/` affiche les erreurs métier et techniques.
+- `services/document-api.service.ts` appelle Quarkus via HttpClient.
+- `models/document.models.ts` décrit les DTO.
+
+Le premier document est sélectionné au chargement. Le panneau latéral est redimensionnable. Les métadonnées AIS et les pièces jointes sont affichées selon la réponse. Les règles métier LRE restent côté Quarkus.
+
+## Exécution de l'hôte public
+
+Node compatible Angular 20 requis, par exemple Node 22.12+ ou 24.
+
+```sh
+npm ci
+npm test
+npm run build
+npm start
+```
+
+Le proxy de développement `/api` vise `http://localhost:8080/docviewer-service/api`. Adapter `proxy.json` pour un autre serveur. L'hôte public ne contient pas le socle privé CoveUse.
+
+Pour les formulaires POST historiques, après compilation utiliser `npm run serve` puis `http://localhost:4201/faces/view.faces`. Le serveur relaie `/api` vers Quarkus. Variables disponibles `PORT` et `API_BACK` (adresse de base complète, par défaut `http://localhost:8080/docviewer-service/api`).
+
+Les routes `/`, `/viewer` et `/faces/view.faces` acceptent les paramètres de lancement. Exemple GET LRE `/viewer?mode=denotresil&code-acam=01&id-lre=123&date-lre=2024-01-01`. AIS utilise `jsonDoc` contenant InterOpId encodé comme paramètre URL ou champ de formulaire.
+
+## Validation et limites
+
+La compilation vérifie les composants et templates Angular. `npm test` couvre les paramètres de lancement et les erreurs métier. L'authentification CoveUse et les appels à l'API interne doivent être testés dans CAP-UP. Les limites de compatibilité portail, multi-écran et fenêtre appelante sont détaillées dans le guide d'intégration.

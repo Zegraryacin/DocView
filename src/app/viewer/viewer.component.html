@@ -1,0 +1,34 @@
+@if (error; as failure) {
+  <app-viewer-error [error]="failure"></app-viewer-error>
+} @else if (loading) {
+  <main class="message" role="status" aria-live="polite">
+    <progress aria-label="Chargement des documents"></progress>
+    <p>La composition des documents est en cours, veuillez patienter pendant le chargement.</p>
+  </main>
+} @else if (!documents.length) {
+  <main class="message" role="status"><h1>Document non disponible</h1><p>Aucun document à afficher.</p></main>
+} @else {
+  <main class="viewer">
+    <aside>
+      <header>Documents Viewer</header>
+      @if (ais; as details) {
+        <button type="button" (click)="toggleScreen()" [attr.aria-pressed]="secondaryScreen">
+          Positionnement sur écran : {{ secondaryScreen ? 'secondaire' : 'principal' }}
+        </button>
+        <dl>
+          <dt>Session</dt><dd>{{ details.sessionId }}</dd>
+          <dt>Client</dt><dd>{{ details.nomClient }}</dd>
+          <dt>Déclaration</dt><dd>{{ details.declaration }} {{ details.cle }}</dd>
+        </dl>
+        @if (details.idSequence) {
+          <button type="button" (click)="showAttachments()">Pièces jointes présentes, cliquer pour les afficher</button>
+        }
+      }
+      <app-document-menu [documents]="documents" [selected]="selected" (documentSelected)="selectDocument($event)"></app-document-menu>
+    </aside>
+    <section aria-label="Consultation du document">
+      @if (notice) { <p role="alert" class="notice">{{ notice }}</p> }
+      <app-pdf-viewer [document]="selected"></app-pdf-viewer>
+    </section>
+  </main>
+}

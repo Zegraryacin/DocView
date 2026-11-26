@@ -1,0 +1,7 @@
+<nav aria-label="Documents">
+  @for (document of documents; track $index) {
+    <button type="button" (click)="documentSelected.emit(document)" [attr.aria-current]="selected === document ? 'true' : null">
+      {{ document.libelle || document.nom || 'Document ' + ($index + 1) }}
+    </button>
+  }
+</nav>

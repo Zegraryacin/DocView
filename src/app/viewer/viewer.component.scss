@@ -1,0 +1,20 @@
+:host { display: block; height: 100dvh; }
+.viewer { display: flex; height: 100%; }
+aside {
+  width: 340px;
+  max-width: 70vw;
+  min-width: 160px;
+  flex-shrink: 0;
+  resize: horizontal;
+  overflow: auto;
+  padding: 20px;
+  border-right: 1px solid #ccd6df;
+}
+header { font-size: 1.4rem; font-weight: 700; padding: 12px 0; margin-bottom: 16px; border-bottom: 1px solid #ccd6df; }
+button { display: block; width: 100%; padding: 10px; text-align: left; background: white; color: inherit; border: 1px solid #c7d2dc; cursor: pointer; font: inherit; }
+section { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+app-pdf-viewer { flex: 1; min-height: 0; }
+dt { font-weight: bold; }
+dd { margin: 0 0 .5em; overflow-wrap: anywhere; }
+.message { max-width: 42em; margin: 15vh auto; padding: 24px; }
+.notice { padding: 12px; }

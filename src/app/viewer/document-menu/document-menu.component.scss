@@ -1,0 +1,4 @@
+nav { padding: 12px 0; }
+button { display: block; width: 100%; padding: 12px; text-align: left; border: 1px solid #c7d2dc; background: white; color: inherit; cursor: pointer; font: inherit; overflow-wrap: anywhere; }
+button[aria-current='true'] { background: #174873; color: white; }
+button:focus-visible { outline: 3px solid #db8c00; outline-offset: 2px; }
